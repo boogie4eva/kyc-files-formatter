@@ -1,4 +1,4 @@
-package kyc_base64_converter
+package model
 
 type (
 	KYCFile struct {
