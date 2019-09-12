@@ -26,7 +26,7 @@ func TestDirReading(t *testing.T) {
 	for i, file := range files {
 		e := processFile(file)
 		if e != nil {
-			t.Logf("Error processing file %e", e)
+			t.Errorf("Error processing file %e", e)
 		} else {
 			t.Logf("Processing xml file  %d Name: %+v", i, file.Name())
 		}
@@ -41,7 +41,10 @@ func processFile(info os.FileInfo) error {
 
 	if _, err := os.Stat(outputDir); os.IsNotExist(err) {
 		// path/to/whatever does not exist
-		os.Mkdir(outputDir, 0666)
+		err := os.Mkdir(outputDir, 0666)
+		if err != nil {
+			return err
+		}
 	}
 	filePath := []string{fileSource, info.Name()}
 	fileContents, e := ioutil.ReadFile(strings.Join(filePath, "/"))
@@ -50,7 +53,13 @@ func processFile(info os.FileInfo) error {
 	}
 
 	output := bytes.Replace(fileContents, []byte("&#13;"), []byte(nil), -1)
-	e = ioutil.WriteFile(fmt.Sprintf("%s/%s-modified", output, info.Name()), output, 0666)
+	dir, e := os.Getwd()
+	if e != nil {
+		return e
+	}
+	conversionPath := fmt.Sprintf("%s/%s/%s", dir, outputDir, info.Name())
+	log.Printf("Conversion %s", conversionPath)
+	e = ioutil.WriteFile(conversionPath, output, 777)
 	if e != nil {
 		return e
 	}
