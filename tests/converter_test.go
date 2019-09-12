@@ -8,11 +8,14 @@ import (
 func TestDirReading(t *testing.T) {
 
 	t.Log("testing reading of directory with xml files ")
-	file, e := ioutil.ReadDir("../sample-ncc")
+	files, e := ioutil.ReadDir("/home/ityger/Projects/Vidicon/sample-ncc")
 	if e != nil {
-		t.Errorf("Error while reading files %s", e)
-
+		t.Fatalf("Error while reading files %s", e)
 	}
-	t.Logf("All files in specified directory %s", file)
+
+	for i, file := range files {
+		t.Logf("Processing xml file  %d Name: %+v", i, file)
+	}
+	//t.Logf("All files in specified directory %q", file)
 
 }
