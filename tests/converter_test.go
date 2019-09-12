@@ -1,21 +1,60 @@
 package main
 
 import (
+	"bytes"
+	"fmt"
 	"io/ioutil"
+	"log"
+	"os"
+	"strings"
 	"testing"
+	"time"
 )
+
+const fileSource = "/home/ityger/Projects/Vidicon/sample-ncc"
+const outputDir = "base64-converter-output"
 
 func TestDirReading(t *testing.T) {
 
 	t.Log("testing reading of directory with xml files ")
-	files, e := ioutil.ReadDir("/home/ityger/Projects/Vidicon/sample-ncc")
+	startTime := time.Now()
+	files, e := ioutil.ReadDir(fileSource)
 	if e != nil {
 		t.Fatalf("Error while reading files %s", e)
 	}
 
 	for i, file := range files {
-		t.Logf("Processing xml file  %d Name: %+v", i, file)
+		e := processFile(file)
+		if e != nil {
+			t.Logf("Error processing file %e", e)
+		} else {
+			t.Logf("Processing xml file  %d Name: %+v", i, file.Name())
+		}
+
 	}
-	//t.Logf("All files in specified directory %q", file)
+	elapsed := time.Since(startTime)
+	t.Logf("Processing time took %s", elapsed)
+
+}
+
+func processFile(info os.FileInfo) error {
+
+	if _, err := os.Stat(outputDir); os.IsNotExist(err) {
+		// path/to/whatever does not exist
+		os.Mkdir(outputDir, 0666)
+	}
+	filePath := []string{fileSource, info.Name()}
+	fileContents, e := ioutil.ReadFile(strings.Join(filePath, "/"))
+	if e != nil {
+		log.Printf("Unable to process %s file %e", info.Name(), e)
+	}
+
+	output := bytes.Replace(fileContents, []byte("&#13;"), []byte(nil), -1)
+	e = ioutil.WriteFile(fmt.Sprintf("%s/%s-modified", output, info.Name()), output, 0666)
+	if e != nil {
+		return e
+	}
+
+	return nil
 
 }
