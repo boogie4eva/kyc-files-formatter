@@ -41,7 +41,7 @@ func processFile(info os.FileInfo) error {
 
 	if _, err := os.Stat(outputDir); os.IsNotExist(err) {
 		// path/to/whatever does not exist
-		os.Mkdir(outputDir, 0666)
+		os.Mkdir(outputDir, 777)
 	}
 	filePath := []string{fileSource, info.Name()}
 	fileContents, e := ioutil.ReadFile(strings.Join(filePath, "/"))
@@ -50,7 +50,13 @@ func processFile(info os.FileInfo) error {
 	}
 
 	output := bytes.Replace(fileContents, []byte("&#13;"), []byte(nil), -1)
-	e = ioutil.WriteFile(fmt.Sprintf("%s/%s-modified", output, info.Name()), output, 0666)
+	dir, e := os.Getwd()
+	if e != nil {
+		return e
+	}
+	conversionPath := fmt.Sprintf("%s/%s", dir, info.Name())
+	log.Printf("Conversion %s", conversionPath)
+	e = ioutil.WriteFile(conversionPath, output, 777)
 	if e != nil {
 		return e
 	}
