@@ -6,13 +6,14 @@ import (
 	"io/ioutil"
 	"log"
 	"os"
+	"path/filepath"
 	"strings"
 	"testing"
 	"time"
 )
 
 const fileSource = "/home/ityger/Projects/Vidicon/sample-ncc"
-const outputDir = "base64-converter-output"
+const outputDir = "base64-formatter-output"
 
 func TestDirReading(t *testing.T) {
 
@@ -38,10 +39,13 @@ func TestDirReading(t *testing.T) {
 }
 
 func processFile(info os.FileInfo) error {
-
+	dir, e := os.Getwd()
+	if e != nil {
+		return e
+	}
 	if _, err := os.Stat(outputDir); os.IsNotExist(err) {
 		// path/to/whatever does not exist
-		err := os.Mkdir(outputDir, 0666)
+		err := os.Mkdir(filepath.Join(dir, outputDir), 0777)
 		if err != nil {
 			return err
 		}
@@ -53,13 +57,11 @@ func processFile(info os.FileInfo) error {
 	}
 
 	output := bytes.Replace(fileContents, []byte("&#13;"), []byte(nil), -1)
-	dir, e := os.Getwd()
-	if e != nil {
-		return e
-	}
-	conversionPath := fmt.Sprintf("%s/%s/%s", dir, outputDir, info.Name())
+
+	//conversionPath := fmt.Sprintf("%s/%s/%s", dir, outputDir, info.Name())
+	conversionPath := fmt.Sprintf(filepath.Join(dir, outputDir)+"/%s", info.Name())
 	log.Printf("Conversion %s", conversionPath)
-	e = ioutil.WriteFile(conversionPath, output, 777)
+	e = ioutil.WriteFile(conversionPath, output, 0777)
 	if e != nil {
 		return e
 	}
