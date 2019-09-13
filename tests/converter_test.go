@@ -59,7 +59,7 @@ func processFile(info os.FileInfo) error {
 	outputForBadCharacter := bytes.Replace(fileContents, []byte("&#13;"), []byte(nil), -1)
 	output := bytes.Replace(outputForBadCharacter, []byte("Re-KYC"), []byte(nil), -1)
 
-	//conversionPath := fmt.Sprintf("%s/%s/%s", dir, outputDir, info.Name())
+	//Write the file with thee check contents stripped
 	conversionPath := fmt.Sprintf(filepath.Join(dir, outputDir)+"/%s", info.Name())
 	log.Printf("Conversion %s", conversionPath)
 	e = ioutil.WriteFile(conversionPath, output, 0777)
