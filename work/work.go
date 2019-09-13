@@ -20,7 +20,6 @@ type (
 	// Worker must be implemented by types that want to use
 	// the work pool.
 	Worker interface {
-		os.FileInfo
 		Task()
 	}
 
@@ -32,7 +31,7 @@ type (
 	}
 
 	KYCFile struct {
-		os.FileInfo
+		File os.FileInfo
 	}
 )
 
@@ -47,9 +46,7 @@ func New(maxGoroutines int, sourceDir string, destDir string) *Pool {
 	for i := 0; i < maxGoroutines; i++ {
 		go func() {
 			for w := range p.work {
-				log.Printf("Processing file %s", w.Name())
 				w.Task()
-				log.Printf("Finished processing file %s", w.Name())
 			}
 			p.wg.Done()
 		}()
@@ -69,8 +66,13 @@ func (p *Pool) Shutdown() {
 }
 
 // KYC file implements Worker interface
-func (kyc *KYCFile) Task(info os.FileInfo) {
-	panic("implement me")
+func (kyc *KYCFile) Task() {
+	log.Printf("Processing file %s", kyc.File.Name())
+	err := processFile(kyc.File)
+	if err != nil {
+		log.Print(fmt.Errorf("unable to process file %e", err))
+	}
+
 }
 
 /**
@@ -84,17 +86,11 @@ func ReadFromDir(dir string) ([]os.FileInfo, error) {
 	return files, nil
 }
 
-func ProcessFile(info os.FileInfo) error {
+// Processes the file passed
+func processFile(info os.FileInfo) error {
 	dir, e := os.Getwd()
 	if e != nil {
 		return e
-	}
-	if _, err := os.Stat(outputDir); os.IsNotExist(err) {
-		// path/to/whatever does not exist
-		err := os.Mkdir(filepath.Join(dir, outputDir), 0777)
-		if err != nil {
-			return err
-		}
 	}
 	filePath := []string{inputDir, info.Name()}
 	fileContents, e := ioutil.ReadFile(strings.Join(filePath, "/"))

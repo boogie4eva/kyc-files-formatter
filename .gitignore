@@ -1,3 +1,5 @@
 .idea
 kyc-base64-converter
 tests/base64-formatter-output
+base64-file-converter
+base64-file-converter.zip
