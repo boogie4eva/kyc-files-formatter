@@ -2,6 +2,7 @@ package main
 
 import (
 	"bytes"
+	"flag"
 	"fmt"
 	"io/ioutil"
 	"log"
@@ -69,4 +70,34 @@ func processFile(info os.FileInfo) error {
 
 	return nil
 
+}
+
+func TestWorkSynchronization(t *testing.T) {
+
+	var inputDirFlag string
+	var outputDirFlag string
+
+	flag.StringVar(&inputDirFlag, "sourceDir", "", "-sourceDir /home/${USER}")
+	flag.StringVar(&outputDirFlag, "destDir", "", "destDir /home/output")
+	flag.Parse()
+	if len(outputDirFlag) == 0 {
+		t.Logf("Output directory not specified using %s", outputDir)
+	}
+	fileInfos, e := ReadFromDir(inputDirFlag)
+	if e != nil {
+		t.Fatalf("Unable to read from input directory %e", e)
+
+	}
+	t.Logf("Input Dir %+v", fileInfos)
+}
+
+/**
+Reads from the specified directory
+*/
+func ReadFromDir(dir string) ([]os.FileInfo, error) {
+	files, e := ioutil.ReadDir(fileSource)
+	if e != nil {
+		return nil, e
+	}
+	return files, nil
 }
