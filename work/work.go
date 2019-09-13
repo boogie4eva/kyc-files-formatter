@@ -103,11 +103,12 @@ func processFile(info os.FileInfo) error {
 
 	//Write the file with thee check contents stripped
 	conversionPath := fmt.Sprintf(filepath.Join(dir, outputDir)+"/%s", info.Name())
-	log.Printf("Conversion %s", conversionPath)
+
 	e = ioutil.WriteFile(conversionPath, output, 0777)
 	if e != nil {
 		return e
 	}
+	log.Printf("Processed file %s", conversionPath)
 	return nil
 
 }
