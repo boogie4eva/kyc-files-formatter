@@ -1,8 +1,8 @@
 package main
 
 import (
-	"bitbucket.org/IyenemiTyger/kyc-base64-converter/work"
 	"flag"
+	"github.com/boogie4eva/kyc-files-formatter/work"
 	"log"
 	"os"
 	"path/filepath"

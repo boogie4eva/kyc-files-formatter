@@ -1,3 +1,3 @@
-module bitbucket.org/IyenemiTyger/kyc-base64-converter
+module github.com/boogie4eva/kyc-files-formatter
 
 go 1.12
